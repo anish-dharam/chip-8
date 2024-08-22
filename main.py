@@ -1,7 +1,5 @@
-from collections import deque
 import pygame
 import sys
-import re
 import array
 
 import chip

@@ -1,6 +1,4 @@
-from collections import deque
 import pygame
-import sys
 import re
 from random import randrange
 

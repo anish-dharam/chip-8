@@ -1,8 +1,8 @@
 import pygame
-import sys
 from pygame.locals import *
 
 from preferences import off
+
 
 class Pane:
     def __init__(self):
