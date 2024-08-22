@@ -41,6 +41,44 @@ def draw_array(surface, array):
             pygame.draw.rect(surface, color, (x * SCALE, y * SCALE, SCALE, SCALE))
 
 
+def get_keys_pressed() -> list[int]:
+    acc = []
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_1]:
+        acc.append(1)
+    if keys[pygame.K_2]:
+        acc.append(2)
+    if keys[pygame.K_3]:
+        acc.append(3)
+    if keys[pygame.K_4]:
+        acc.append(0xC)
+    if keys[pygame.K_q]:
+        acc.append(4)
+    if keys[pygame.K_w]:
+        acc.append(5)
+    if keys[pygame.K_e]:
+        acc.append(6)
+    if keys[pygame.K_r]:
+        acc.append(0xD)
+    if keys[pygame.K_a]:
+        acc.append(7)
+    if keys[pygame.K_s]:
+        acc.append(8)
+    if keys[pygame.K_d]:
+        acc.append(9)
+    if keys[pygame.K_f]:
+        acc.append(0xE)
+    if keys[pygame.K_z]:
+        acc.append(0xA)
+    if keys[pygame.K_x]:
+        acc.append(0)
+    if keys[pygame.K_c]:
+        acc.append(0xB)
+    if keys[pygame.K_v]:
+        acc.append(0xF)
+    return acc
+
+
 debug = False
 
 running = True
@@ -77,7 +115,7 @@ while running:
                     print(chip_8.registers[user_in])
             user_in = input("enter to continue/view\n")
 
-    redraw = chip_8.execute(chip_8.fetch())
+    redraw = chip_8.execute(chip_8.fetch(), get_keys_pressed())
 
     # if re.match('f.0a', chip_8.hex):
     #     debug = True

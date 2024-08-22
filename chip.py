@@ -45,7 +45,7 @@ class Chip8:
         self.vx = self.registers[self.x]
         self.vy = self.registers[self.y]
 
-    def execute(self, num: int) -> bool:
+    def execute(self, num: int, keys: list[int]) -> bool:
         """returns a boolean indicating whether we need to re-render"""
         opcode = "{0:04b}".format(num // 4096)
         previous = copy.deepcopy(self.display)
@@ -53,7 +53,7 @@ class Chip8:
             case "0":
                 self.opcode_zero(num)
             case "1":
-                self.opcode_one(num)
+                self.opcode_one(num, keys)
             case _:
                 print(f"opcode neither 0 nor 1: {'{0:04x}'.format(num)}")
                 pygame.quit()
@@ -96,7 +96,7 @@ class Chip8:
             pygame.quit()
             exit()
 
-    def opcode_one(self, num: int):
+    def opcode_one(self, num: int, keys: list[int]):
         self.decode(num)
         hex_match = lambda pattern: re.match(pattern, self.hex)
 
@@ -188,10 +188,10 @@ class Chip8:
                         assert not self.display[pos[1]][pos[0]]
                         self.display[pos[1]][pos[0]] = True
         elif hex_match("e.9e"):  # skip if correct key pressed
-            if self.vx in get_keys_pressed():
+            if self.vx in keys:
                 self.pc += 2
         elif hex_match("e.a1"):  # skip if correct key not pressed
-            if self.vx not in get_keys_pressed():
+            if self.vx not in keys:
                 self.pc += 2
         elif hex_match("f..."):  # f opcode
             f_match = lambda pattern: re.match(pattern, self.hex[1:])
@@ -209,9 +209,8 @@ class Chip8:
                 if self.I >= 4096:
                     self.registers[0xF] = 1
             elif f_match(".0a"):  # get key
-                pressed = get_keys_pressed()
-                if pressed:
-                    self.registers[self.x] = pressed[0]
+                if keys:
+                    self.registers[self.x] = keys[0]
                     return
                 self.pc -= 2
             elif f_match(".29"):  # font character
@@ -258,41 +257,3 @@ class Chip8:
         print(f"pc: {self.pc}")
         print(f"last executed instruction: {self.hex}")
         print(f"stack: {self.stack}")
-
-
-def get_keys_pressed() -> list[int]:
-    acc = []
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_1]:
-        acc.append(1)
-    if keys[pygame.K_2]:
-        acc.append(2)
-    if keys[pygame.K_3]:
-        acc.append(3)
-    if keys[pygame.K_4]:
-        acc.append(0xC)
-    if keys[pygame.K_q]:
-        acc.append(4)
-    if keys[pygame.K_w]:
-        acc.append(5)
-    if keys[pygame.K_e]:
-        acc.append(6)
-    if keys[pygame.K_r]:
-        acc.append(0xD)
-    if keys[pygame.K_a]:
-        acc.append(7)
-    if keys[pygame.K_s]:
-        acc.append(8)
-    if keys[pygame.K_d]:
-        acc.append(9)
-    if keys[pygame.K_f]:
-        acc.append(0xE)
-    if keys[pygame.K_z]:
-        acc.append(0xA)
-    if keys[pygame.K_x]:
-        acc.append(0)
-    if keys[pygame.K_c]:
-        acc.append(0xB)
-    if keys[pygame.K_v]:
-        acc.append(0xF)
-    return acc
