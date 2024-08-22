@@ -3,15 +3,24 @@ import sys
 import array
 
 import chip
-from preferences import program_name, window_width, window_height, fps
+from preferences import program_name, SCALE, fps, ON, OFF
 
 # NOTE: Nearly everything you'd reasonably want to tweak is found in preferences.py
 
-chip_8 = chip.Chip8()
 
 # disclaimer- I have a global 'game' loop because pygame doesn't support two windows run by one process
 
 ############################## 'game' loop
+
+pygame.init()
+pygame.display.set_caption("Anish's chip-8")
+
+window_width = 64 * SCALE
+window_height = 32 * SCALE
+display = pygame.display.set_mode((window_width, window_height))
+pygame.display.set_caption("Anish's Chip-8")
+
+chip_8 = chip.Chip8()
 
 clock = pygame.time.Clock()
 sixtieth_second = pygame.USEREVENT + 1
@@ -24,7 +33,13 @@ beep = pygame.mixer.Sound(array.array("b"))
 # load programs
 chip_8.load_program(program_name)
 
-bigger_window = pygame.display.set_mode((window_width, window_height))
+
+def draw_array(surface, array):
+    for y, row in enumerate(array):
+        for x, value in enumerate(row):
+            color = ON if value else OFF  # White for True, Black for False
+            pygame.draw.rect(surface, color, (x * SCALE, y * SCALE, SCALE, SCALE))
+
 
 debug = False
 
@@ -62,7 +77,7 @@ while running:
                     print(chip_8.registers[user_in])
             user_in = input("enter to continue/view\n")
 
-    chip_8.execute(chip_8.fetch())
+    redraw = chip_8.execute(chip_8.fetch())
 
     # if re.match('f.0a', chip_8.hex):
     #     debug = True
@@ -71,12 +86,16 @@ while running:
     #     debug = False
 
     clock.tick(fps)
-    scaled_window = pygame.transform.smoothscale(
-        chip_8.display.screen, (window_width, window_height)
-    )
-    bigger_window.blit(scaled_window, (0, 0))
-    pygame.display.flip()
-    pygame.display.update()
+
+    if redraw:
+        draw_array(display, chip_8.display)
+        pygame.display.update()
+    # scaled_window = pygame.transform.smoothscale(
+    #     chip_8.display.screen, (window_width, window_height)
+    # )
+    # bigger_window.blit(scaled_window, (0, 0))
+    # pygame.display.flip()
+    # pygame.display.update()
 
 
 assert not running

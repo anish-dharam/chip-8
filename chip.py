@@ -1,14 +1,13 @@
 import pygame
 import re
 from random import randrange
+import copy
 
 import components
 from preferences import (
     offset_jump_original,
     shift_original,
     store_and_load_memory_original,
-    on,
-    off,
 )
 
 
@@ -46,9 +45,10 @@ class Chip8:
         self.vx = self.registers[self.x]
         self.vy = self.registers[self.y]
 
-    def execute(self, num: int):
+    def execute(self, num: int) -> bool:
+        """returns a boolean indicating whether we need to re-render"""
         opcode = "{0:04b}".format(num // 4096)
-
+        previous = copy.deepcopy(self.display)
         match opcode[0]:
             case "0":
                 self.opcode_zero(num)
@@ -59,13 +59,15 @@ class Chip8:
                 pygame.quit()
                 exit()
 
+        return self.display != previous
+
     def opcode_zero(self, num: int):
         self.decode(num)
 
         hex_match = lambda pattern: re.match(pattern, self.hex)
 
         if hex_match("00e0"):  # clear screen
-            self.display.clear_screen()
+            self.display = [[False for _ in range(64)] for _ in range(32)]
         elif hex_match("1..."):  # jump
             self.pc = self.nnn
         elif hex_match("2..."):  # call subroutine
@@ -179,12 +181,12 @@ class Chip8:
                     if not to_draw[column]:
                         continue  # sprite pixel is off
                     # now we know that the sprite pixel is on
-                    if self.display.screen.get_at(pos) == on:
+                    if self.display[pos[1]][pos[0]]:
                         self.registers[0xF] = 1  # pixel flip!
-                        self.display.screen.set_at(pos, off)
+                        self.display[pos[1]][pos[0]] = False
                     else:
-                        assert self.display.screen.get_at(pos) == off
-                        self.display.screen.set_at(pos, on)
+                        assert not self.display[pos[1]][pos[0]]
+                        self.display[pos[1]][pos[0]] = True
         elif hex_match("e.9e"):  # skip if correct key pressed
             if self.vx in get_keys_pressed():
                 self.pc += 2

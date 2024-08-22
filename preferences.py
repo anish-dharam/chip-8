@@ -19,12 +19,11 @@ store_and_load_memory_original = True
 
 fps = 1700
 
-window_height = 512  # know that the width will be twice this
-window_width = 2 * window_height
+SCALE = 15
 
 # change these values if you want different display colors (pygame specific feature)
-on = (255, 255, 255)
-off = (0, 0, 0)
+ON = (255, 255, 255)
+OFF = (0, 0, 0)
 
 # change this value to load different programs
-program_name = "PATH_HERE"
+program_name = "chip-8-master/cavern/cavern.ch8"
