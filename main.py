@@ -30,8 +30,11 @@ pygame.mixer.init()
 beep = pygame.mixer.Sound(array.array("b"))
 
 
-# load programs
-chip_8.load_program(program_name)
+# load program
+if len(sys.argv) > 1 and sys.argv[1]:
+    chip_8.load_program(sys.argv[1])
+else:
+    chip_8.load_program(program_name)
 
 
 def draw_array(surface, array):
