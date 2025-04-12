@@ -1,6 +1,7 @@
 # README
 
 Requires pygame
+
 Main resource used was: https://tobiasvl.github.io/blog/write-a-chip-8-emulator/
 with a little help from the following references:
 
